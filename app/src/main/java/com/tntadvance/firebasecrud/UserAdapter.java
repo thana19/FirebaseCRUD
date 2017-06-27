@@ -36,7 +36,18 @@ public class UserAdapter extends BaseAdapter {
     }
 
     @Override
-    public View getView(int i, View view, ViewGroup viewGroup) {
-        return null;
+    public View getView(int position, View view, ViewGroup viewGroup) {
+        UserListItem item;
+        if (view != null)
+            item = (UserListItem) view;
+        else
+            item = new UserListItem(viewGroup.getContext());
+
+        UserDao dao = users.get(position);
+
+        item.setTvName(dao.getName());
+        item.setTvGroup(dao.getGroup());
+
+        return item;
     }
 }

@@ -10,8 +10,12 @@ import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,6 +28,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Button btnAdd;
     private ListView listView;
     private List<UserDao> users;
+    private UserAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +37,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         initInstances();
         initFirebase();
+        showData();
     }
 
     private void initFirebase() {
@@ -71,7 +77,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             firebaseReference.child("users").child(id).setValue(user);
 
-            Toast.makeText(this, "Artist added", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "User added", Toast.LENGTH_LONG).show();
             edName.setText("");
         } else {
             //if the value is not given displaying a toast
@@ -79,24 +85,27 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-//    private void showArtist() {
-//        Query query = databaseReference.child("users");
-//        query.addValueEventListener(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(DataSnapshot dataSnapshot) {
-//                users.clear();
-//                for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
-//                    UserDao user = postSnapshot.getValue(UserDao.class);
-//                    users.add(user);
-//                }
-//                adapter = new UserAdapter(users);
-//                listView.setAdapter(adapter);
-//            }
-//
-//            @Override
-//            public void onCancelled(DatabaseError databaseError) {
-//
-//            }
-//        });
-//    }
+    private void showData() {
+        Query query = firebaseReference.child("users");
+        query.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                users.clear();
+                for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
+                    UserDao dao = postSnapshot.getValue(UserDao.class);
+                    users.add(dao);
+                }
+                adapter = new UserAdapter(users);
+                listView.setAdapter(adapter);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+    }
+
+
 }
